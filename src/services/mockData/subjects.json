@@ -1,0 +1,20 @@
+[
+  {
+    "Id": 1,
+    "name": "Anatomy",
+    "noteCount": 4,
+    "icon": "User"
+  },
+  {
+    "Id": 2,
+    "name": "Histology",
+    "noteCount": 4,
+    "icon": "Microscope"
+  },
+  {
+    "Id": 3,
+    "name": "Embryology",
+    "noteCount": 4,
+    "icon": "Dna"
+  }
+]

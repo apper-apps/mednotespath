@@ -1,0 +1,20 @@
+[
+  {
+    "Id": 1,
+    "noteId": "1",
+    "pageNumber": 15,
+    "timestamp": "2024-01-20T10:30:00Z"
+  },
+  {
+    "Id": 2,
+    "noteId": "5",
+    "pageNumber": 8,
+    "timestamp": "2024-01-19T14:45:00Z"
+  },
+  {
+    "Id": 3,
+    "noteId": "9",
+    "pageNumber": 22,
+    "timestamp": "2024-01-18T09:15:00Z"
+  }
+]

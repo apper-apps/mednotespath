@@ -1,0 +1,122 @@
+[
+  {
+    "Id": 1,
+    "title": "Human Anatomy - Cardiovascular System",
+    "description": "Comprehensive study of the heart, blood vessels, and circulation. Covers cardiac anatomy, blood flow dynamics, and cardiovascular pathophysiology.",
+    "subject": "Anatomy",
+    "pdfUrl": "/pdfs/cardiovascular-system.pdf",
+    "thumbnailUrl": "/thumbnails/cardiovascular.jpg",
+    "pageCount": 45,
+    "freePages": 3
+  },
+  {
+    "Id": 2,
+    "title": "Respiratory System Anatomy",
+    "description": "Detailed exploration of respiratory organs including lungs, airways, and gas exchange mechanisms. Essential for understanding breathing physiology.",
+    "subject": "Anatomy",
+    "pdfUrl": "/pdfs/respiratory-system.pdf",
+    "thumbnailUrl": "/thumbnails/respiratory.jpg",
+    "pageCount": 38,
+    "freePages": 3
+  },
+  {
+    "Id": 3,
+    "title": "Musculoskeletal System Overview",
+    "description": "Complete guide to bones, muscles, joints, and connective tissues. Includes movement mechanics and common pathologies.",
+    "subject": "Anatomy",
+    "pdfUrl": "/pdfs/musculoskeletal-system.pdf",
+    "thumbnailUrl": "/thumbnails/musculoskeletal.jpg",
+    "pageCount": 52,
+    "freePages": 3
+  },
+  {
+    "Id": 4,
+    "title": "Nervous System Anatomy",
+    "description": "In-depth study of the central and peripheral nervous systems. Covers brain structure, spinal cord, and neural pathways.",
+    "subject": "Anatomy",
+    "pdfUrl": "/pdfs/nervous-system.pdf",
+    "thumbnailUrl": "/thumbnails/nervous.jpg",
+    "pageCount": 67,
+    "freePages": 3
+  },
+  {
+    "Id": 5,
+    "title": "Epithelial Tissue Histology",
+    "description": "Microscopic examination of epithelial tissues including structure, function, and classification of different epithelial types.",
+    "subject": "Histology",
+    "pdfUrl": "/pdfs/epithelial-tissue.pdf",
+    "thumbnailUrl": "/thumbnails/epithelial.jpg",
+    "pageCount": 29,
+    "freePages": 3
+  },
+  {
+    "Id": 6,
+    "title": "Connective Tissue Types",
+    "description": "Comprehensive analysis of connective tissues including bone, cartilage, blood, and loose/dense connective tissues.",
+    "subject": "Histology",
+    "pdfUrl": "/pdfs/connective-tissue.pdf",
+    "thumbnailUrl": "/thumbnails/connective.jpg",
+    "pageCount": 34,
+    "freePages": 3
+  },
+  {
+    "Id": 7,
+    "title": "Muscle Tissue Histology",
+    "description": "Detailed study of skeletal, cardiac, and smooth muscle tissues. Includes microscopic structure and contractile mechanisms.",
+    "subject": "Histology",
+    "pdfUrl": "/pdfs/muscle-tissue.pdf",
+    "thumbnailUrl": "/thumbnails/muscle.jpg",
+    "pageCount": 31,
+    "freePages": 3
+  },
+  {
+    "Id": 8,
+    "title": "Neural Tissue Organization",
+    "description": "Microscopic structure of nervous tissue including neurons, glial cells, and neural organization patterns.",
+    "subject": "Histology",
+    "pdfUrl": "/pdfs/neural-tissue.pdf",
+    "thumbnailUrl": "/thumbnails/neural.jpg",
+    "pageCount": 28,
+    "freePages": 3
+  },
+  {
+    "Id": 9,
+    "title": "Early Human Development",
+    "description": "Comprehensive overview of human embryonic development from fertilization through the first trimester. Covers key developmental milestones.",
+    "subject": "Embryology",
+    "pdfUrl": "/pdfs/early-development.pdf",
+    "thumbnailUrl": "/thumbnails/early-dev.jpg",
+    "pageCount": 42,
+    "freePages": 3
+  },
+  {
+    "Id": 10,
+    "title": "Organ System Formation",
+    "description": "Detailed study of organogenesis including cardiovascular, nervous, and digestive system development during embryonic period.",
+    "subject": "Embryology",
+    "pdfUrl": "/pdfs/organ-formation.pdf",
+    "thumbnailUrl": "/thumbnails/organ-form.jpg",
+    "pageCount": 39,
+    "freePages": 3
+  },
+  {
+    "Id": 11,
+    "title": "Fetal Development Stages",
+    "description": "Complete guide to fetal development from 9 weeks to birth. Includes growth patterns and developmental abnormalities.",
+    "subject": "Embryology",
+    "pdfUrl": "/pdfs/fetal-development.pdf",
+    "thumbnailUrl": "/thumbnails/fetal.jpg",
+    "pageCount": 48,
+    "freePages": 3
+  },
+  {
+    "Id": 12,
+    "title": "Reproductive System Development",
+    "description": "Specialized study of reproductive organ development, sexual differentiation, and common developmental disorders.",
+    "subject": "Embryology",
+    "pdfUrl": "/pdfs/reproductive-dev.pdf",
+    "thumbnailUrl": "/thumbnails/reproductive.jpg",
+    "pageCount": 33,
+    "freePages": 3
+  }
+]

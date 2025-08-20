@@ -1,0 +1,30 @@
+[
+  {
+    "Id": 1,
+    "noteId": "1",
+    "pagesViewed": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
+    "lastViewedPage": 15,
+    "completionPercent": 33
+  },
+  {
+    "Id": 2,
+    "noteId": "5",
+    "pagesViewed": [1, 2, 3, 4, 5, 6, 7, 8],
+    "lastViewedPage": 8,
+    "completionPercent": 28
+  },
+  {
+    "Id": 3,
+    "noteId": "9",
+    "pagesViewed": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22],
+    "lastViewedPage": 22,
+    "completionPercent": 52
+  },
+  {
+    "Id": 4,
+    "noteId": "2",
+    "pagesViewed": [1, 2, 3, 4, 5, 6],
+    "lastViewedPage": 6,
+    "completionPercent": 16
+  }
+]
