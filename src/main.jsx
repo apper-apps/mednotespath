@@ -6,30 +6,8 @@ import { Workbox } from 'workbox-window'
 import { toast } from 'react-toastify'
 
 // Register service worker for PWA functionality
-if ('serviceWorker' in navigator) {
-  const wb = new Workbox('/sw.js')
-  
-  wb.addEventListener('controlling', () => {
-    window.location.reload()
-  })
-  
-  wb.addEventListener('waiting', () => {
-    toast.info(
-      'New app update available! Click to refresh.',
-      {
-        onClick: () => {
-          wb.messageSkipWaiting()
-        },
-        autoClose: false,
-        closeButton: true
-      }
-    )
-  })
-  
-  wb.register().catch((error) => {
-    console.error('Service Worker registration failed:', error)
-  })
-}
+// Service worker is automatically handled by vite-plugin-pwa
+// No manual registration needed
 
 // Add offline/online status detection
 window.addEventListener('online', () => {
