@@ -1,13 +1,13 @@
-import { useState, useEffect } from 'react'
-import { toast } from 'react-toastify'
-import ApperIcon from '@/components/ApperIcon'
-import Button from '@/components/atoms/Button'
-import Input from '@/components/atoms/Input'
-import Badge from '@/components/atoms/Badge'
-import Loading from '@/components/ui/Loading'
-import Error from '@/components/ui/Error'
-import { noteService } from '@/services/api/noteService'
-import { cn } from '@/utils/cn'
+import React, { useEffect, useState } from "react";
+import { toast } from "react-toastify";
+import { noteService } from "@/services/api/noteService";
+import ApperIcon from "@/components/ApperIcon";
+import Error from "@/components/ui/Error";
+import Loading from "@/components/ui/Loading";
+import Button from "@/components/atoms/Button";
+import Badge from "@/components/atoms/Badge";
+import Input from "@/components/atoms/Input";
+import { cn } from "@/utils/cn";
 
 function AdminDashboardPage() {
   // Authentication state
@@ -24,11 +24,19 @@ function AdminDashboardPage() {
   })
   const [uploadLoading, setUploadLoading] = useState(false)
 
-  // Notes management state
+// Notes management state
   const [notes, setNotes] = useState([])
   const [notesLoading, setNotesLoading] = useState(false)
   const [notesError, setNotesError] = useState(null)
-
+  
+  // Edit note state
+  const [editingNote, setEditingNote] = useState(null)
+  const [editForm, setEditForm] = useState({
+    title: '',
+    description: '',
+    subject: 'Anatomy'
+  })
+  const [editLoading, setEditLoading] = useState(false)
   // Load notes when authenticated
   useEffect(() => {
     if (isAuthenticated) {
@@ -73,11 +81,53 @@ function AdminDashboardPage() {
     }))
   }
 
-  function handleUploadInputChange(field, value) {
+function handleUploadInputChange(field, value) {
     setUploadForm(prev => ({
       ...prev,
       [field]: value
     }))
+  }
+
+  function handleEditInputChange(field, value) {
+    setEditForm(prev => ({
+      ...prev,
+      [field]: value
+    }))
+  }
+
+  function handleEditNote(note) {
+    setEditingNote(note)
+    setEditForm({
+      title: note.title,
+      description: note.description,
+      subject: note.subject
+    })
+  }
+
+  function handleCancelEdit() {
+    setEditingNote(null)
+    setEditForm({
+      title: '',
+      description: '',
+      subject: 'Anatomy'
+    })
+  }
+
+  async function handleEditSubmit(e) {
+    e.preventDefault()
+    if (!editingNote) return
+
+    setEditLoading(true)
+    try {
+      await noteService.update(editingNote.Id, editForm)
+      await loadNotes()
+      handleCancelEdit()
+      toast.success(`Updated "${editForm.title}"`)
+    } catch (error) {
+      toast.error('Failed to update note: ' + error.message)
+    } finally {
+      setEditLoading(false)
+    }
   }
 
   function handleFileSelect(e) {
@@ -136,8 +186,7 @@ function AdminDashboardPage() {
       setUploadLoading(false)
     }
   }
-
-  async function handleDeleteNote(noteId, title) {
+async function handleDeleteNote(noteId, title) {
     if (!confirm(`Are you sure you want to delete "${title}"?`)) {
       return
     }
@@ -251,33 +300,48 @@ function AdminDashboardPage() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
-          {/* Upload Note Section */}
+{/* Upload Form */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
           <div className="bg-white rounded-2xl shadow-lg p-6">
             <div className="flex items-center gap-3 mb-6">
-              <div className="bg-primary/10 rounded-lg p-2">
-                <ApperIcon name="Upload" className="w-5 h-5 text-primary" />
+              <div className="bg-green-100 rounded-full p-2">
+                <ApperIcon name="Upload" className="w-5 h-5 text-green-600" />
               </div>
               <h2 className="text-xl font-semibold text-text-primary">Upload New Note</h2>
             </div>
 
-            <form onSubmit={handleUploadSubmit} className="space-y-6">
+            <form onSubmit={handleUploadSubmit} className="space-y-4">
               <Input
                 label="Title"
+                type="text"
                 value={uploadForm.title}
                 onChange={(e) => handleUploadInputChange('title', e.target.value)}
                 placeholder="Enter note title"
                 required
               />
 
-              <div className="space-y-2">
-                <label className="block text-sm font-medium text-text-primary">
-                  Category
+              <div>
+                <label className="block text-sm font-medium text-text-primary mb-2">
+                  Description
+                </label>
+                <textarea
+                  value={uploadForm.description}
+                  onChange={(e) => handleUploadInputChange('description', e.target.value)}
+                  placeholder="Enter note description"
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary resize-none"
+                  rows={3}
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-text-primary mb-2">
+                  Subject
                 </label>
                 <select
                   value={uploadForm.subject}
                   onChange={(e) => handleUploadInputChange('subject', e.target.value)}
-                  className="flex h-10 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary"
                 >
                   <option value="Anatomy">Anatomy</option>
                   <option value="Histology">Histology</option>
@@ -285,45 +349,23 @@ function AdminDashboardPage() {
                 </select>
               </div>
 
-              <div className="space-y-2">
-                <label className="block text-sm font-medium text-text-primary">
-                  Description
-                </label>
-                <textarea
-                  value={uploadForm.description}
-                  onChange={(e) => handleUploadInputChange('description', e.target.value)}
-                  placeholder="Enter note description"
-                  rows={4}
-                  required
-                  className="flex w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm placeholder:text-text-secondary focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent resize-none"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <label className="block text-sm font-medium text-text-primary">
+              <div>
+                <label className="block text-sm font-medium text-text-primary mb-2">
                   PDF File
                 </label>
-                <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-primary/50 transition-colors">
-                  <ApperIcon name="FileText" className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-                  <p className="text-sm text-text-secondary mb-3">
-                    {uploadForm.file ? uploadForm.file.name : 'Click to select a PDF file'}
+                <input
+                  id="pdf-upload"
+                  type="file"
+                  accept=".pdf"
+                  onChange={handleFileSelect}
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                  required
+                />
+                {uploadForm.file && (
+                  <p className="text-sm text-green-600 mt-2">
+                    Selected: {uploadForm.file.name}
                   </p>
-                  <input
-                    id="pdf-upload"
-                    type="file"
-                    accept="application/pdf"
-                    onChange={handleFileSelect}
-                    className="hidden"
-                  />
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => document.getElementById('pdf-upload').click()}
-                  >
-                    <ApperIcon name="FolderOpen" className="w-4 h-4 mr-2" />
-                    Select PDF
-                  </Button>
-                </div>
+                )}
               </div>
 
               <Button
@@ -346,82 +388,165 @@ function AdminDashboardPage() {
             </form>
           </div>
 
-          {/* Notes Management Section */}
-          <div className="bg-white rounded-2xl shadow-lg p-6">
-            <div className="flex items-center justify-between mb-6">
-              <div className="flex items-center gap-3">
-                <div className="bg-primary/10 rounded-lg p-2">
-                  <ApperIcon name="FileText" className="w-5 h-5 text-primary" />
-                </div>
-                <h2 className="text-xl font-semibold text-text-primary">Manage Notes</h2>
-              </div>
-              <Button variant="outline" onClick={loadNotes}>
-                <ApperIcon name="RefreshCw" className="w-4 h-4 mr-2" />
-                Refresh
-              </Button>
-            </div>
-
-            {notesLoading && (
-              <div className="flex justify-center py-12">
-                <Loading />
-              </div>
-            )}
-
-            {notesError && (
-              <Error
-                message={notesError}
-                onRetry={loadNotes}
-              />
-            )}
-
-            {!notesLoading && !notesError && (
-              <div className="space-y-4 max-h-96 overflow-y-auto custom-scrollbar">
-                {notes.length === 0 ? (
-                  <div className="text-center py-8 text-text-secondary">
-                    <ApperIcon name="FileText" className="w-12 h-12 mx-auto mb-3 text-gray-300" />
-                    <p>No notes available</p>
+          {/* Edit Form */}
+          {editingNote && (
+            <div className="bg-white rounded-2xl shadow-lg p-6">
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-3">
+                  <div className="bg-blue-100 rounded-full p-2">
+                    <ApperIcon name="Edit" className="w-5 h-5 text-blue-600" />
                   </div>
-                ) : (
-                  notes.map((note) => (
-                    <div
-                      key={note.Id}
-                      className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"
-                    >
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1 min-w-0">
-                          <h3 className="font-medium text-text-primary truncate">
-                            {note.title}
-                          </h3>
-                          <p className="text-sm text-text-secondary mt-1 line-clamp-2">
-                            {note.description}
-                          </p>
-                          <div className="flex items-center gap-2 mt-3">
-                            <Badge 
-                              variant="secondary"
-                              className={getSubjectColor(note.subject)}
-                            >
-                              {note.subject}
-                            </Badge>
-                            <span className="text-xs text-text-secondary">
-                              ID: {note.Id}
-                            </span>
-                          </div>
-                        </div>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleDeleteNote(note.Id, note.title)}
-                          className="text-red-600 hover:text-red-700 hover:bg-red-50 ml-2"
+                  <h2 className="text-xl font-semibold text-text-primary">Edit Note</h2>
+                </div>
+                <Button variant="ghost" size="sm" onClick={handleCancelEdit}>
+                  <ApperIcon name="X" className="w-4 h-4" />
+                </Button>
+              </div>
+
+              <form onSubmit={handleEditSubmit} className="space-y-4">
+                <Input
+                  label="Title"
+                  type="text"
+                  value={editForm.title}
+                  onChange={(e) => handleEditInputChange('title', e.target.value)}
+                  placeholder="Enter note title"
+                  required
+                />
+
+                <div>
+                  <label className="block text-sm font-medium text-text-primary mb-2">
+                    Description
+                  </label>
+                  <textarea
+                    value={editForm.description}
+                    onChange={(e) => handleEditInputChange('description', e.target.value)}
+                    placeholder="Enter note description"
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary resize-none"
+                    rows={3}
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-text-primary mb-2">
+                    Subject
+                  </label>
+                  <select
+                    value={editForm.subject}
+                    onChange={(e) => handleEditInputChange('subject', e.target.value)}
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                  >
+                    <option value="Anatomy">Anatomy</option>
+                    <option value="Histology">Histology</option>
+                    <option value="Embryology">Embryology</option>
+                  </select>
+                </div>
+
+                <div className="flex gap-3">
+                  <Button
+                    type="submit"
+                    className="flex-1"
+                    disabled={editLoading}
+                  >
+                    {editLoading ? (
+                      <>
+                        <ApperIcon name="Loader2" className="w-4 h-4 mr-2 animate-spin" />
+                        Updating...
+                      </>
+                    ) : (
+                      <>
+                        <ApperIcon name="Save" className="w-4 h-4 mr-2" />
+                        Update Note
+                      </>
+                    )}
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handleCancelEdit}
+                  >
+                    Cancel
+                  </Button>
+                </div>
+              </form>
+            </div>
+          )}
+        </div>
+
+        {/* Notes List */}
+        <div className="bg-white rounded-2xl shadow-lg p-6">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="bg-purple-100 rounded-full p-2">
+              <ApperIcon name="BookOpen" className="w-5 h-5 text-purple-600" />
+            </div>
+            <h2 className="text-xl font-semibold text-text-primary">All Notes</h2>
+            <Badge variant="secondary" className="ml-auto">
+              {notes.length} notes
+            </Badge>
+          </div>
+
+          {notesLoading ? (
+            <Loading message="Loading notes..." />
+          ) : notesError ? (
+            <Error message={notesError} onRetry={loadNotes} />
+          ) : notes.length === 0 ? (
+            <div className="text-center py-12">
+              <div className="bg-gray-100 rounded-full p-4 w-16 h-16 mx-auto mb-4 flex items-center justify-center">
+                <ApperIcon name="FileX" className="w-8 h-8 text-gray-400" />
+              </div>
+              <p className="text-text-secondary">No notes uploaded yet</p>
+              <p className="text-sm text-text-secondary mt-1">Upload your first medical note to get started</p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {notes.map((note) => (
+                <div
+                  key={note.Id}
+                  className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"
+                >
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-medium text-text-primary truncate">
+                        {note.title}
+                      </h3>
+                      <p className="text-sm text-text-secondary mt-1 line-clamp-2">
+                        {note.description}
+                      </p>
+                      <div className="flex items-center gap-2 mt-3">
+                        <Badge 
+                          variant="secondary"
+                          className={getSubjectColor(note.subject)}
                         >
-                          <ApperIcon name="Trash2" className="w-4 h-4" />
-                        </Button>
+                          {note.subject}
+                        </Badge>
+                        <span className="text-xs text-text-secondary">
+                          ID: {note.Id}
+                        </span>
                       </div>
                     </div>
-                  ))
-                )}
-              </div>
-            )}
-          </div>
+                    <div className="flex items-center gap-2 ml-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleEditNote(note)}
+                        className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                      >
+                        <ApperIcon name="Edit2" className="w-4 h-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleDeleteNote(note.Id, note.title)}
+                        className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                      >
+                        <ApperIcon name="Trash2" className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>
