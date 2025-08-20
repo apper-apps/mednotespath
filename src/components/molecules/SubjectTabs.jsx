@@ -2,9 +2,9 @@ import { cn } from "@/utils/cn"
 import ApperIcon from "@/components/ApperIcon"
 
 const SubjectTabs = ({ subjects, activeSubject, onSubjectChange, className, ...props }) => {
-  const getSubjectIcon = (name) => {
+const getSubjectIcon = (name) => {
     const icons = {
-      "Anatomy": "User",
+      "Anatomy Uncovered": "User",
       "Histology": "Microscope",
       "Embryology": "Dna"
     }
