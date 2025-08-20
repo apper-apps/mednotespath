@@ -8,6 +8,11 @@ export const progressService = {
     return [...progressData]
   },
 
+  async getAllByUser(userId) {
+    await delay(250)
+    return progressData.filter(p => p.userId === userId).map(p => ({ ...p }))
+  },
+
   async getById(id) {
     await delay(200)
     const progress = progressData.find(p => p.Id === id)
@@ -23,11 +28,20 @@ export const progressService = {
     return progress ? { ...progress } : null
   },
 
+  async getByUserAndNote(userId, noteId) {
+    await delay(250)
+    const progress = progressData.find(p => 
+      p.userId === userId && p.noteId === noteId.toString()
+    )
+    return progress ? { ...progress } : null
+  },
+
   async create(progressItem) {
     await delay(300)
     const maxId = Math.max(...progressData.map(p => p.Id), 0)
     const newProgress = {
       Id: maxId + 1,
+      lastUpdated: new Date().toISOString(),
       ...progressItem
     }
     progressData.push(newProgress)
@@ -40,7 +54,11 @@ export const progressService = {
     if (index === -1) {
       throw new Error("Progress not found")
     }
-    progressData[index] = { ...progressData[index], ...progressItem }
+    progressData[index] = { 
+      ...progressData[index], 
+      ...progressItem,
+      lastUpdated: new Date().toISOString()
+    }
     return { ...progressData[index] }
   },
 

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react"
 import { useParams, useNavigate } from "react-router-dom"
 import { Link } from "react-router-dom"
+import { useAuth } from "@/contexts/AuthContext"
 import PDFViewer from "@/components/organisms/PDFViewer"
 import Loading from "@/components/ui/Loading"
 import Error from "@/components/ui/Error"
@@ -12,9 +13,10 @@ import { noteService } from "@/services/api/noteService"
 const NoteViewerPage = () => {
   const { noteId } = useParams()
   const navigate = useNavigate()
-  const [note, setNote] = useState(null)
+const [note, setNote] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
+  const { user } = useAuth()
 
   const loadNote = async () => {
     try {
@@ -30,7 +32,7 @@ const NoteViewerPage = () => {
   }
 
   useEffect(() => {
-    if (noteId) {
+if (noteId) {
       loadNote()
     }
   }, [noteId])
@@ -87,7 +89,7 @@ const NoteViewerPage = () => {
           <span className="text-text-primary font-medium">{note.title}</span>
         </nav>
 
-        {/* Header */}
+{/* Header */}
         <div className="bg-white rounded-lg p-6 mb-6 shadow-sm border">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
             <div className="flex-1">
@@ -109,6 +111,12 @@ const NoteViewerPage = () => {
                   <ApperIcon name="Eye" className="w-4 h-4" />
                   {note.freePages} pages free
                 </span>
+                {!user && (
+                  <span className="flex items-center gap-1 text-primary">
+                    <ApperIcon name="User" className="w-4 h-4" />
+                    Sign in to bookmark
+                  </span>
+                )}
               </div>
             </div>
             
@@ -121,7 +129,16 @@ const NoteViewerPage = () => {
                 <ApperIcon name="ArrowLeft" className="w-4 h-4 mr-2" />
                 Back
               </Button>
-              {note.freePages < note.pageCount && (
+{!user && (
+                <Button
+                  size="sm"
+                  onClick={() => navigate("/login")}
+                >
+                  <ApperIcon name="User" className="w-4 h-4 mr-2" />
+                  Sign In
+                </Button>
+              )}
+              {user && note.freePages < note.pageCount && !user.isPremium && (
                 <Button
                   size="sm"
                   onClick={() => navigate("/premium")}

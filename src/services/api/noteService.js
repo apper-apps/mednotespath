@@ -35,7 +35,7 @@ export const noteService = {
     }))
   },
 
-  async search(query, sortBy = "newest") {
+  async search(query, sortBy = "newest", userId = null) {
     await delay(300)
     let results = notesData.filter(note => 
       note.title.toLowerCase().includes(query.toLowerCase()) ||
@@ -47,10 +47,10 @@ export const noteService = {
       viewCount: Math.floor(Math.random() * 1000) + 10
     }))
 
-    return await this.sortNotes(results, sortBy)
+    return await this.sortNotes(results, sortBy, userId)
   },
 
-  async sortNotes(notes, sortBy) {
+  async sortNotes(notes, sortBy, userId = null) {
     await delay(100)
     const notesCopy = [...notes]
     
@@ -63,7 +63,9 @@ export const noteService = {
       
       case "bookmarked":
         try {
-          const bookmarks = await bookmarkService.getAll()
+          const bookmarks = userId 
+            ? await bookmarkService.getAllByUser(userId)
+            : await bookmarkService.getAll()
           const bookmarkedNoteIds = new Set(bookmarks.map(b => parseInt(b.noteId)))
           
           return notesCopy.sort((a, b) => {

@@ -1,5 +1,7 @@
 import { useState } from "react"
+import { useNavigate } from "react-router-dom"
 import { toast } from "react-toastify"
+import { useAuth } from "@/contexts/AuthContext"
 import ApperIcon from "@/components/ApperIcon"
 import Button from "@/components/atoms/Button"
 import { cn } from "@/utils/cn"
@@ -70,10 +72,27 @@ const PremiumPage = () => {
     }
   ]
 
-  const handleUpgrade = () => {
-    // Simulate payment processing
-    toast.success("Payment processing... This is a demo!")
+const handleUpgrade = async () => {
+    if (!user) {
+      navigate('/login', { state: { from: { pathname: '/premium' } } })
+      return
+    }
+
+    if (user.isPremium) {
+      toast.info("You're already a Premium member!")
+      return
+    }
+
+    try {
+      await upgradeToPremium()
+      toast.success("Congratulations! Welcome to Premium!")
+    } catch (err) {
+      toast.error("Error processing upgrade. This is a demo!")
+    }
   }
+
+  const { user, upgradeToPremium } = useAuth()
+  const navigate = useNavigate()
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-white via-primary/5 to-primary-light/10">
@@ -155,18 +174,29 @@ const PremiumPage = () => {
             ))}
           </div>
           
-          <div className="text-center mt-8">
+<div className="text-center mt-8">
             <Button 
               size="xl"
               onClick={handleUpgrade}
               className="w-full sm:w-auto px-12"
+              disabled={user?.isPremium}
             >
               <ApperIcon name="Zap" className="w-5 h-5 mr-2" />
-              Start Premium Now
+              {user?.isPremium ? 'Already Premium!' : user ? 'Start Premium Now' : 'Sign In to Upgrade'}
             </Button>
             <p className="text-sm text-text-secondary mt-4">
-              30-day money-back guarantee • Cancel anytime
+              {user?.isPremium ? 'Thank you for being a Premium member!' : '30-day money-back guarantee • Cancel anytime'}
             </p>
+            {!user && (
+              <p className="text-sm text-primary mt-2">
+                <button 
+                  onClick={() => navigate('/signup')}
+                  className="underline hover:no-underline"
+                >
+                  Create a free account
+                </button> to get started
+              </p>
+            )}
           </div>
         </div>
 

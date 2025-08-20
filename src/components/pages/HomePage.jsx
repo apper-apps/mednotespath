@@ -17,10 +17,10 @@ const HomePage = () => {
       title: "Study Anywhere",
       description: "Responsive design works perfectly on phones, tablets, and laptops"
     },
-    {
+{
       icon: "Bookmark",
       title: "Save Progress",
-      description: "Bookmark pages and continue reading where you left off"
+      description: "Create an account to bookmark pages and continue where you left off"
     },
     {
       icon: "Zap",
@@ -81,7 +81,7 @@ const HomePage = () => {
             </p>
             
             {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+<div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <Button 
                 size="xl"
                 onClick={() => navigate("/library")}
@@ -93,11 +93,11 @@ const HomePage = () => {
               <Button 
                 variant="outline" 
                 size="xl"
-                onClick={() => navigate("/premium")}
+                onClick={() => navigate("/login")}
                 className="w-full sm:w-auto"
               >
-                <ApperIcon name="Crown" className="w-5 h-5 mr-2" />
-                View Premium
+                <ApperIcon name="User" className="w-5 h-5 mr-2" />
+                Create Account
               </Button>
             </div>
           </div>
@@ -191,7 +191,7 @@ const HomePage = () => {
           <p className="text-lg text-text-secondary mb-8">
             Join thousands of medical students who trust MedNotes Pro for their studies
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+<div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button 
               size="lg"
               onClick={() => navigate("/library")}
@@ -202,10 +202,10 @@ const HomePage = () => {
             <Button 
               variant="outline" 
               size="lg"
-              onClick={() => navigate("/premium")}
+              onClick={() => navigate("/signup")}
             >
-              <ApperIcon name="Crown" className="w-5 h-5 mr-2" />
-              Upgrade to Premium
+              <ApperIcon name="UserPlus" className="w-5 h-5 mr-2" />
+              Join Free Today
             </Button>
           </div>
         </div>

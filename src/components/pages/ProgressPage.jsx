@@ -1,31 +1,38 @@
-import { useState, useEffect } from "react"
-import { useNavigate } from "react-router-dom"
-import { format } from "date-fns"
-import ApperIcon from "@/components/ApperIcon"
-import Button from "@/components/atoms/Button"
-import Badge from "@/components/atoms/Badge"
-import Loading from "@/components/ui/Loading"
-import Error from "@/components/ui/Error"
-import Empty from "@/components/ui/Empty"
-import { bookmarkService } from "@/services/api/bookmarkService"
-import { progressService } from "@/services/api/progressService"
-import { noteService } from "@/services/api/noteService"
-
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { format } from "date-fns";
+import { useAuth } from "@/contexts/AuthContext";
+import { bookmarkService } from "@/services/api/bookmarkService";
+import { progressService } from "@/services/api/progressService";
+import { noteService } from "@/services/api/noteService";
+import ApperIcon from "@/components/ApperIcon";
+import Error from "@/components/ui/Error";
+import Empty from "@/components/ui/Empty";
+import Loading from "@/components/ui/Loading";
+import Button from "@/components/atoms/Button";
+import Badge from "@/components/atoms/Badge";
 const ProgressPage = () => {
-  const [bookmarks, setBookmarks] = useState([])
+const [bookmarks, setBookmarks] = useState([])
   const [progress, setProgress] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
+  const { user } = useAuth()
   const navigate = useNavigate()
 
-  const loadData = async () => {
+const loadData = async () => {
     try {
       setLoading(true)
       setError("")
       
+      if (!user) {
+        setBookmarks([])
+        setProgress([])
+        return
+      }
+      
       const [bookmarksData, progressData] = await Promise.all([
-        bookmarkService.getAll(),
-        progressService.getAll()
+        bookmarkService.getAllByUser(user.Id),
+        progressService.getAllByUser(user.Id)
       ])
       
       // Enrich bookmarks with note details
@@ -61,9 +68,9 @@ const ProgressPage = () => {
     }
   }
 
-  useEffect(() => {
+useEffect(() => {
     loadData()
-  }, [])
+  }, [user])
 
   const handleContinueReading = (bookmark) => {
     navigate(`/note/${bookmark.noteId}`)
@@ -101,6 +108,43 @@ const ProgressPage = () => {
       <div className="min-h-screen bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <Error onRetry={loadData} />
+        </div>
+      </div>
+    )
+  }
+
+if (!user) {
+    return (
+      <div className="min-h-screen bg-white">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+          <div className="text-center">
+            <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
+              <ApperIcon name="User" className="w-8 h-8 text-primary" />
+            </div>
+            <h1 className="text-3xl font-bold text-text-primary mb-4">
+              Sign In Required
+            </h1>
+            <p className="text-lg text-text-secondary mb-8">
+              Create an account to track your progress and bookmark your favorite notes
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button 
+                size="lg"
+                onClick={() => navigate("/signup")}
+              >
+                <ApperIcon name="UserPlus" className="w-5 h-5 mr-2" />
+                Create Account
+              </Button>
+              <Button 
+                variant="outline" 
+                size="lg"
+                onClick={() => navigate("/login")}
+              >
+                <ApperIcon name="LogIn" className="w-5 h-5 mr-2" />
+                Sign In
+              </Button>
+            </div>
+          </div>
         </div>
       </div>
     )
@@ -258,9 +302,8 @@ const ProgressPage = () => {
             </div>
           </div>
         </div>
-
         {/* Study Statistics */}
-        {(bookmarks.length > 0 || progress.length > 0) && (
+{(bookmarks.length > 0 || progress.length > 0) && (
           <div className="mt-8 bg-gradient-to-br from-primary/5 to-primary-light/5 rounded-lg p-6">
             <h3 className="text-lg font-semibold text-text-primary mb-4">
               Study Statistics
@@ -305,7 +348,7 @@ const ProgressPage = () => {
             </div>
           </div>
         )}
-      </div>
+</div>
     </div>
   )
 }

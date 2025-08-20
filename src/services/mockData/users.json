@@ -1,0 +1,31 @@
+[
+  {
+    "Id": 1,
+    "name": "John Smith",
+    "email": "john@example.com",
+    "password": "password123",
+    "isPremium": true,
+    "createdAt": "2024-01-15T10:00:00Z",
+    "lastLogin": "2024-03-20T14:30:00Z",
+    "premiumUpgradedAt": "2024-02-01T09:15:00Z"
+  },
+  {
+    "Id": 2,
+    "name": "Sarah Johnson",
+    "email": "sarah@example.com",
+    "password": "password123",
+    "isPremium": false,
+    "createdAt": "2024-02-10T08:45:00Z",
+    "lastLogin": "2024-03-19T16:20:00Z"
+  },
+  {
+    "Id": 3,
+    "name": "Mike Chen",
+    "email": "mike@example.com",
+    "password": "password123",
+    "isPremium": true,
+    "createdAt": "2024-01-28T12:30:00Z",
+    "lastLogin": "2024-03-20T11:10:00Z",
+    "premiumUpgradedAt": "2024-03-01T15:45:00Z"
+  }
+]
