@@ -117,7 +117,19 @@ async create(noteData) {
     if (index === -1) {
       throw new Error("Note not found")
     }
-    const deleted = notesData.splice(index, 1)[0]
+const deleted = notesData.splice(index, 1)[0]
     return { ...deleted }
+  },
+
+  // Analytics methods
+  async getReadersAnalytics() {
+    await delay(300)
+    return notesData.map(note => ({
+      noteId: note.Id,
+      title: note.title,
+      subject: note.subject,
+      totalPages: note.pageCount,
+      freePages: note.freePages
+    }))
   }
 }

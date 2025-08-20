@@ -25,9 +25,20 @@ function AdminDashboardPage() {
   const [uploadLoading, setUploadLoading] = useState(false)
 
 // Notes management state
-  const [notes, setNotes] = useState([])
+const [notes, setNotes] = useState([])
   const [notesLoading, setNotesLoading] = useState(false)
   const [notesError, setNotesError] = useState(null)
+  
+  // Analytics state
+  const [analyticsData, setAnalyticsData] = useState({
+    readersPerNote: [],
+    premiumVsFree: null,
+    activeStudents: null,
+    engagementTrends: [],
+    subjectPopularity: []
+  })
+  const [analyticsLoading, setAnalyticsLoading] = useState(false)
+  const [analyticsError, setAnalyticsError] = useState(null)
   
   // Edit note state
   const [editingNote, setEditingNote] = useState(null)
@@ -37,11 +48,13 @@ function AdminDashboardPage() {
     subject: 'Anatomy'
   })
   const [editLoading, setEditLoading] = useState(false)
-  // Load notes when authenticated
+
+  // Load notes and analytics when authenticated
   useEffect(() => {
     if (isAuthenticated) {
       loadNotes()
-    }
+      loadAnalytics()
+}
   }, [isAuthenticated])
 
   async function loadNotes() {
@@ -54,7 +67,37 @@ function AdminDashboardPage() {
       setNotesError(error.message)
       toast.error('Failed to load notes')
     } finally {
-      setNotesLoading(false)
+setNotesLoading(false)
+    }
+  }
+
+  async function loadAnalytics() {
+    setAnalyticsLoading(true)
+    setAnalyticsError(null)
+    try {
+      const { analyticsService } = await import('@/services/api/analyticsService')
+      
+      const [readersData, usageData, studentsData, trendsData, popularityData] = await Promise.all([
+        analyticsService.getReadersPerNote(),
+        analyticsService.getPremiumVsFreeUsage(),
+        analyticsService.getActiveStudents(),
+        analyticsService.getEngagementTrends(),
+        analyticsService.getSubjectPopularity()
+      ])
+      
+      setAnalyticsData({
+        readersPerNote: readersData,
+        premiumVsFree: usageData,
+        activeStudents: studentsData,
+        engagementTrends: trendsData,
+        subjectPopularity: popularityData
+      })
+    } catch (error) {
+      console.error('Failed to load analytics:', error)
+      setAnalyticsError('Failed to load analytics data')
+      toast.error('Failed to load analytics data')
+    } finally {
+      setAnalyticsLoading(false)
     }
   }
 
@@ -73,7 +116,6 @@ function AdminDashboardPage() {
     }
     setLoginLoading(false)
   }
-
   function handleLoginInputChange(field, value) {
     setLoginForm(prev => ({
       ...prev,
@@ -278,7 +320,7 @@ async function handleDeleteNote(noteId, title) {
   }
 
   // Admin dashboard
-  return (
+return (
     <div className="min-h-screen bg-gradient-to-br from-primary/5 to-primary-light/10 p-4 md:p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
@@ -290,7 +332,7 @@ async function handleDeleteNote(noteId, title) {
               </div>
               <div>
                 <h1 className="text-2xl font-bold text-text-primary">Admin Dashboard</h1>
-                <p className="text-text-secondary">Manage medical education notes</p>
+                <p className="text-text-secondary">Manage medical education notes & analytics</p>
               </div>
             </div>
             <Button variant="outline" onClick={handleLogout}>
@@ -300,7 +342,204 @@ async function handleDeleteNote(noteId, title) {
           </div>
         </div>
 
-{/* Upload Form */}
+        {/* Analytics Dashboard */}
+        <div className="mb-8">
+          <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="bg-primary/10 rounded-full p-2">
+                <ApperIcon name="BarChart" className="w-5 h-5 text-primary" />
+              </div>
+              <h2 className="text-xl font-semibold text-text-primary">Analytics Dashboard</h2>
+            </div>
+
+            {analyticsLoading ? (
+              <div className="flex items-center justify-center py-12">
+                <div className="flex items-center gap-2">
+                  <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                  <span className="text-text-secondary">Loading analytics...</span>
+                </div>
+              </div>
+            ) : analyticsError ? (
+              <div className="text-center py-12">
+                <ApperIcon name="AlertCircle" className="w-12 h-12 text-red-500 mx-auto mb-4" />
+                <p className="text-red-600 font-medium">{analyticsError}</p>
+                <Button onClick={loadAnalytics} className="mt-4">
+                  <ApperIcon name="RotateCcw" className="w-4 h-4 mr-2" />
+                  Retry
+                </Button>
+              </div>
+            ) : (
+              <div className="space-y-6">
+                {/* Key Metrics Cards */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                  <div className="bg-gradient-to-r from-blue-50 to-blue-100 rounded-xl p-4 border border-blue-200">
+                    <div className="flex items-center gap-3">
+                      <div className="bg-blue-500 rounded-lg p-2">
+                        <ApperIcon name="Users" className="w-5 h-5 text-white" />
+                      </div>
+                      <div>
+                        <p className="text-blue-600 text-sm font-medium">Total Students</p>
+                        <p className="text-2xl font-bold text-blue-700">{analyticsData.activeStudents?.total || 0}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-gradient-to-r from-green-50 to-green-100 rounded-xl p-4 border border-green-200">
+                    <div className="flex items-center gap-3">
+                      <div className="bg-green-500 rounded-lg p-2">
+                        <ApperIcon name="Crown" className="w-5 h-5 text-white" />
+                      </div>
+                      <div>
+                        <p className="text-green-600 text-sm font-medium">Premium Users</p>
+                        <p className="text-2xl font-bold text-green-700">{analyticsData.premiumVsFree?.premium.users || 0}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-gradient-to-r from-purple-50 to-purple-100 rounded-xl p-4 border border-purple-200">
+                    <div className="flex items-center gap-3">
+                      <div className="bg-purple-500 rounded-lg p-2">
+                        <ApperIcon name="Activity" className="w-5 h-5 text-white" />
+                      </div>
+                      <div>
+                        <p className="text-purple-600 text-sm font-medium">Active This Week</p>
+                        <p className="text-2xl font-bold text-purple-700">{analyticsData.activeStudents?.activeThisWeek || 0}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-gradient-to-r from-orange-50 to-orange-100 rounded-xl p-4 border border-orange-200">
+                    <div className="flex items-center gap-3">
+                      <div className="bg-orange-500 rounded-lg p-2">
+                        <ApperIcon name="TrendingUp" className="w-5 h-5 text-white" />
+                      </div>
+                      <div>
+                        <p className="text-orange-600 text-sm font-medium">Retention Rate</p>
+                        <p className="text-2xl font-bold text-orange-700">{analyticsData.activeStudents?.retentionRate || 0}%</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Charts Grid */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  {/* Readers Per Note */}
+                  <div className="bg-gray-50 rounded-xl p-4">
+                    <h3 className="text-lg font-semibold text-text-primary mb-4">Readers Per Note</h3>
+                    <div className="space-y-3 max-h-64 overflow-y-auto">
+                      {analyticsData.readersPerNote.map((note, index) => (
+                        <div key={note.noteId} className="flex items-center justify-between p-3 bg-white rounded-lg">
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium text-text-primary truncate">{note.title}</p>
+                            <p className="text-xs text-text-secondary">{note.subject}</p>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Badge variant={note.readers > 2 ? 'success' : 'secondary'}>
+                              {note.readers} readers
+                            </Badge>
+                            <span className="text-xs text-text-secondary">{note.averageProgress}% avg</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Premium vs Free Usage */}
+                  <div className="bg-gray-50 rounded-xl p-4">
+                    <h3 className="text-lg font-semibold text-text-primary mb-4">Premium vs Free Usage</h3>
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between p-4 bg-white rounded-lg border-l-4 border-primary">
+                        <div>
+                          <p className="font-medium text-text-primary">Premium Users</p>
+                          <p className="text-sm text-text-secondary">{analyticsData.premiumVsFree?.premium.averageViewsPerUser || 0} avg views/user</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-2xl font-bold text-primary">{analyticsData.premiumVsFree?.premium.users || 0}</p>
+                          <p className="text-sm text-text-secondary">{analyticsData.premiumVsFree?.premium.totalViews || 0} total views</p>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-center justify-between p-4 bg-white rounded-lg border-l-4 border-gray-400">
+                        <div>
+                          <p className="font-medium text-text-primary">Free Users</p>
+                          <p className="text-sm text-text-secondary">{analyticsData.premiumVsFree?.free.averageViewsPerUser || 0} avg views/user</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-2xl font-bold text-gray-600">{analyticsData.premiumVsFree?.free.users || 0}</p>
+                          <p className="text-sm text-text-secondary">{analyticsData.premiumVsFree?.free.totalViews || 0} total views</p>
+                        </div>
+                      </div>
+                      
+                      <div className="bg-gradient-to-r from-primary/10 to-primary-light/10 rounded-lg p-3 text-center">
+                        <p className="text-sm text-text-secondary">Conversion Rate</p>
+                        <p className="text-xl font-bold text-primary">{analyticsData.premiumVsFree?.conversionRate || 0}%</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Subject Popularity */}
+                  <div className="bg-gray-50 rounded-xl p-4">
+                    <h3 className="text-lg font-semibold text-text-primary mb-4">Subject Popularity</h3>
+                    <div className="space-y-3">
+                      {analyticsData.subjectPopularity.map((subject, index) => {
+                        const colors = {
+                          Anatomy: 'bg-blue-500',
+                          Histology: 'bg-green-500', 
+                          Embryology: 'bg-purple-500'
+                        }
+                        return (
+                          <div key={subject.subject} className="flex items-center justify-between p-3 bg-white rounded-lg">
+                            <div className="flex items-center gap-3">
+                              <div className={`w-3 h-3 rounded-full ${colors[subject.subject] || 'bg-gray-500'}`} />
+                              <span className="font-medium text-text-primary">{subject.subject}</span>
+                            </div>
+                            <div className="flex items-center gap-4 text-sm text-text-secondary">
+                              <span>{subject.views} views</span>
+                              <span>{subject.notes} notes</span>
+                              <span>{subject.averageProgress}% avg progress</span>
+                            </div>
+                          </div>
+                        )
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Engagement Levels */}
+                  <div className="bg-gray-50 rounded-xl p-4">
+                    <h3 className="text-lg font-semibold text-text-primary mb-4">Student Engagement</h3>
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between p-3 bg-white rounded-lg border-l-4 border-green-500">
+                        <div className="flex items-center gap-3">
+                          <ApperIcon name="Zap" className="w-5 h-5 text-green-500" />
+                          <span className="font-medium text-text-primary">High Engagement</span>
+                        </div>
+                        <span className="text-2xl font-bold text-green-600">{analyticsData.activeStudents?.engagementLevels.high || 0}</span>
+                      </div>
+                      
+                      <div className="flex items-center justify-between p-3 bg-white rounded-lg border-l-4 border-yellow-500">
+                        <div className="flex items-center gap-3">
+                          <ApperIcon name="Minus" className="w-5 h-5 text-yellow-500" />
+                          <span className="font-medium text-text-primary">Medium Engagement</span>
+                        </div>
+                        <span className="text-2xl font-bold text-yellow-600">{analyticsData.activeStudents?.engagementLevels.medium || 0}</span>
+                      </div>
+                      
+                      <div className="flex items-center justify-between p-3 bg-white rounded-lg border-l-4 border-red-500">
+                        <div className="flex items-center gap-3">
+                          <ApperIcon name="TrendingDown" className="w-5 h-5 text-red-500" />
+                          <span className="font-medium text-text-primary">Low Engagement</span>
+                        </div>
+                        <span className="text-2xl font-bold text-red-600">{analyticsData.activeStudents?.engagementLevels.low || 0}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Upload Form */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
           <div className="bg-white rounded-2xl shadow-lg p-6">
             <div className="flex items-center gap-3 mb-6">
