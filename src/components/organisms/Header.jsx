@@ -16,11 +16,12 @@ const Header = ({ className, ...props }) => {
     }
   }
 
-  const navigationItems = [
+const navigationItems = [
     { label: "Home", path: "/", icon: "Home" },
     { label: "Library", path: "/library", icon: "BookOpen" },
     { label: "My Progress", path: "/progress", icon: "TrendingUp" },
-    { label: "Premium", path: "/premium", icon: "Crown" }
+    { label: "Premium", path: "/premium", icon: "Crown" },
+    { label: "Admin", path: "/admin", icon: "Shield" }
   ]
 
   return (

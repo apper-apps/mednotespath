@@ -84,11 +84,17 @@ export const noteService = {
     }
   },
 
-  async create(noteData) {
+async create(noteData) {
     await delay(400)
     const maxId = Math.max(...notesData.map(n => n.Id), 0)
     const newNote = {
       Id: maxId + 1,
+      title: noteData.title || "Untitled Note",
+      description: noteData.description || "",
+      subject: noteData.subject || "Anatomy",
+      fileUrl: noteData.fileUrl || `https://example.com/pdfs/${noteData.title?.toLowerCase().replace(/\s+/g, '-')}.pdf`,
+      createdAt: new Date().toISOString(),
+      viewCount: 0,
       ...noteData
     }
     notesData.push(newNote)
