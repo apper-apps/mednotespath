@@ -2,7 +2,7 @@ import usersData from '@/services/mockData/users.json'
 
 // Admin credentials
 const ADMIN_CREDENTIALS = {
-  username: 'admin',
+  email: 'admin@mednotes.com',
   password: 'admin123',
   user: {
     Id: 999,
@@ -22,6 +22,15 @@ let currentUser = null
 export const authService = {
   async login(email, password) {
     await delay(500)
+    
+    // Check admin credentials first
+    if (email === ADMIN_CREDENTIALS.email && password === ADMIN_CREDENTIALS.password) {
+      currentUser = { ...ADMIN_CREDENTIALS.user }
+      localStorage.setItem('currentUser', JSON.stringify(currentUser))
+      return currentUser
+    }
+    
+    // Check regular users
     const user = usersData.find(u => u.email === email && u.password === password)
     
     if (!user) {

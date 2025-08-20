@@ -39,13 +39,13 @@ function LoginPage() {
     setIsSubmitting(true)
     
 try {
-      // Check if admin credentials
-      if (formData.email === 'admin' && formData.password === 'admin123') {
-        await login(formData.email, formData.password)
+      const user = await login(formData.email, formData.password)
+      
+      // Check if admin user
+      if (user.role === 'admin') {
         toast.success('Welcome back, Administrator!')
         navigate('/admin', { replace: true })
       } else {
-        await login(formData.email, formData.password)
         toast.success('Welcome back!')
         navigate(from, { replace: true })
       }

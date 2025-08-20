@@ -109,8 +109,8 @@ export function AuthProvider({ children }) {
     dispatch({ type: 'CLEAR_ERROR' })
   }
 
-  const value = {
-...state,
+const value = {
+    ...state,
     login,
     signup,
     logout,

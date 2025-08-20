@@ -219,8 +219,12 @@ function AccountPage() {
                     <Badge className="text-yellow-700 bg-yellow-100 border-yellow-200 mb-2">
                       Premium Member
                     </Badge>
-                    <p className="text-sm text-text-secondary">
-                      Upgraded on {format(new Date(user.premiumUpgradedAt), "MMM d, yyyy")}
+<p className="text-sm text-text-secondary">
+                      {user.premiumUpgradedAt ? (
+                        <>Upgraded on {format(new Date(user.premiumUpgradedAt), "MMM d, yyyy")}</>
+                      ) : (
+                        'Premium member'
+                      )}
                     </p>
                   </>
                 ) : (
