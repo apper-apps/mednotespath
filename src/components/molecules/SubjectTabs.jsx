@@ -14,9 +14,9 @@ const SubjectTabs = ({ subjects, activeSubject, onSubjectChange, className, ...p
   return (
     <div className={cn("border-b border-gray-200 mb-6", className)} {...props}>
       <nav className="-mb-px flex space-x-8 overflow-x-auto">
-        {subjects.map((subject) => (
+{subjects.map((subject, index) => (
           <button
-            key={subject.id}
+            key={subject?.id || subject?.name || index}
             onClick={() => onSubjectChange(subject.name)}
             className={cn(
               "flex items-center gap-2 py-4 px-1 border-b-2 font-medium text-sm whitespace-nowrap transition-colors duration-200",
