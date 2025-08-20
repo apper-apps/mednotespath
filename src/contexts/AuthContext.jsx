@@ -110,13 +110,14 @@ export function AuthProvider({ children }) {
   }
 
   const value = {
-    ...state,
+...state,
     login,
     signup,
     logout,
     updateUser,
     upgradeToPremium,
-    clearError
+    clearError,
+    isAdmin: state.user?.role === 'admin'
   }
 
   return (

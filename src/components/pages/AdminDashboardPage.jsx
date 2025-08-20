@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
 import { toast } from "react-toastify";
 import { noteService } from "@/services/api/noteService";
 import ApperIcon from "@/components/ApperIcon";
@@ -11,9 +13,8 @@ import { cn } from "@/utils/cn";
 
 function AdminDashboardPage() {
   // Authentication state
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
-  const [loginForm, setLoginForm] = useState({ username: '', password: '' })
-  const [loginLoading, setLoginLoading] = useState(false)
+const { user, isAdmin, logout: authLogout } = useAuth()
+  const navigate = useNavigate()
 
   // Upload form state
   const [uploadForm, setUploadForm] = useState({
@@ -50,12 +51,14 @@ const [notes, setNotes] = useState([])
   const [editLoading, setEditLoading] = useState(false)
 
   // Load notes and analytics when authenticated
-  useEffect(() => {
-    if (isAuthenticated) {
-      loadNotes()
-      loadAnalytics()
-}
-  }, [isAuthenticated])
+useEffect(() => {
+    if (!user || !isAdmin) {
+      navigate('/login')
+      return
+    }
+    loadNotes()
+    loadAnalytics()
+  }, [user, isAdmin, navigate])
 
   async function loadNotes() {
     setNotesLoading(true)
@@ -101,27 +104,7 @@ setNotesLoading(false)
     }
   }
 
-  async function handleLogin(e) {
-    e.preventDefault()
-    setLoginLoading(true)
-
-    // Simulate admin authentication
-    await new Promise(resolve => setTimeout(resolve, 1000))
-
-    if (loginForm.username === 'admin' && loginForm.password === 'admin123') {
-      setIsAuthenticated(true)
-      toast.success('Successfully logged in as admin')
-    } else {
-      toast.error('Invalid credentials. Use admin/admin123')
-    }
-    setLoginLoading(false)
-  }
-  function handleLoginInputChange(field, value) {
-    setLoginForm(prev => ({
-      ...prev,
-      [field]: value
-    }))
-  }
+// Removed local login functions - using global auth
 
 function handleUploadInputChange(field, value) {
     setUploadForm(prev => ({
@@ -242,10 +225,10 @@ async function handleDeleteNote(noteId, title) {
     }
   }
 
-  function handleLogout() {
-    setIsAuthenticated(false)
-    setLoginForm({ username: '', password: '' })
+async function handleLogout() {
+    await authLogout()
     toast.info('Logged out successfully')
+    navigate('/login')
   }
 
   function getSubjectColor(subject) {
@@ -258,65 +241,9 @@ async function handleDeleteNote(noteId, title) {
   }
 
   // Login screen
-  if (!isAuthenticated) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-primary/5 to-primary-light/10 flex items-center justify-center p-4">
-        <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md">
-          <div className="text-center mb-8">
-            <div className="bg-primary/10 rounded-full p-3 w-16 h-16 mx-auto mb-4 flex items-center justify-center">
-              <ApperIcon name="Shield" className="w-8 h-8 text-primary" />
-            </div>
-            <h1 className="text-2xl font-bold text-text-primary mb-2">Admin Dashboard</h1>
-            <p className="text-text-secondary">Login to manage medical notes</p>
-          </div>
-
-          <form onSubmit={handleLogin} className="space-y-6">
-            <Input
-              label="Username"
-              type="text"
-              value={loginForm.username}
-              onChange={(e) => handleLoginInputChange('username', e.target.value)}
-              placeholder="Enter admin username"
-              required
-            />
-            <Input
-              label="Password"
-              type="password"
-              value={loginForm.password}
-              onChange={(e) => handleLoginInputChange('password', e.target.value)}
-              placeholder="Enter admin password"
-              required
-            />
-            
-            <Button
-              type="submit"
-              className="w-full"
-              disabled={loginLoading}
-            >
-              {loginLoading ? (
-                <>
-                  <ApperIcon name="Loader2" className="w-4 h-4 mr-2 animate-spin" />
-                  Logging in...
-                </>
-              ) : (
-                <>
-                  <ApperIcon name="LogIn" className="w-4 h-4 mr-2" />
-                  Login
-                </>
-              )}
-            </Button>
-          </form>
-
-          <div className="mt-6 p-4 bg-primary/5 rounded-lg">
-            <p className="text-sm text-text-secondary text-center">
-              <strong>Demo credentials:</strong><br />
-              Username: admin<br />
-              Password: admin123
-            </p>
-          </div>
-        </div>
-      </div>
-    )
+// Redirect to login if not admin - handled by useEffect
+  if (!user || !isAdmin) {
+    return <Loading />
   }
 
   // Admin dashboard

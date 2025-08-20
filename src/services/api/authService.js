@@ -1,4 +1,18 @@
-import usersData from "@/services/mockData/users.json"
+import usersData from '@/services/mockData/users.json'
+
+// Admin credentials
+const ADMIN_CREDENTIALS = {
+  username: 'admin',
+  password: 'admin123',
+  user: {
+    Id: 999,
+    email: 'admin@mednotes.com',
+    name: 'System Administrator',
+    role: 'admin',
+    isPremium: true,
+    createdAt: new Date().toISOString()
+  }
+}
 
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms))
 

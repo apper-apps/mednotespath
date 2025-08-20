@@ -38,10 +38,17 @@ function LoginPage() {
     
     setIsSubmitting(true)
     
-    try {
-      await login(formData.email, formData.password)
-      toast.success('Welcome back!')
-      navigate(from, { replace: true })
+try {
+      // Check if admin credentials
+      if (formData.email === 'admin' && formData.password === 'admin123') {
+        await login(formData.email, formData.password)
+        toast.success('Welcome back, Administrator!')
+        navigate('/admin', { replace: true })
+      } else {
+        await login(formData.email, formData.password)
+        toast.success('Welcome back!')
+        navigate(from, { replace: true })
+      }
     } catch (err) {
       toast.error(err.message)
     } finally {
