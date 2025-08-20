@@ -6,30 +6,29 @@ import Error from "@/components/ui/Error"
 import Empty from "@/components/ui/Empty"
 import { noteService } from "@/services/api/noteService"
 
-const NotesList = ({ subject, searchQuery }) => {
+const NotesList = ({ subject, searchQuery, sortBy = "newest" }) => {
   const [notes, setNotes] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
   const navigate = useNavigate()
 
-  const loadNotes = async () => {
+const loadNotes = async () => {
     try {
       setLoading(true)
       setError("")
       
       let data
-      if (subject && subject !== "All") {
-        data = await noteService.getBySubject(subject)
-      } else {
-        data = await noteService.getAll()
-      }
-      
-      // Filter by search query if provided
       if (searchQuery) {
-        data = data.filter(note => 
-          note.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          note.description.toLowerCase().includes(searchQuery.toLowerCase())
-        )
+        // Use search method when searching
+        data = await noteService.search(searchQuery, sortBy)
+      } else if (subject && subject !== "All") {
+        // Get by subject and then sort
+        data = await noteService.getBySubject(subject)
+        data = await noteService.sortNotes(data, sortBy)
+      } else {
+        // Get all notes and sort
+        data = await noteService.getAll()
+        data = await noteService.sortNotes(data, sortBy)
       }
       
       setNotes(data)
@@ -40,10 +39,9 @@ const NotesList = ({ subject, searchQuery }) => {
     }
   }
 
-  useEffect(() => {
+useEffect(() => {
     loadNotes()
-  }, [subject, searchQuery])
-
+  }, [subject, searchQuery, sortBy])
   const handleViewNote = (note) => {
     navigate(`/note/${note.Id}`)
   }
